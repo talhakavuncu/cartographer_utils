@@ -15,7 +15,7 @@ utmzone = '35T'
 
 while not rospy.is_shutdown():
     try:
-        (trans,rot) = listener.lookupTransform('/utm', '/imu_link', rospy.Time(0))
+        (trans,rot) = listener.lookupTransform('/utm', '/imu_link_cartographer', rospy.Time(0))
     except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
         print("CANNOT OBTAIN TRANSFORM")
         continue
@@ -25,10 +25,12 @@ while not rospy.is_shutdown():
     northing = y_coord
     easting = x_coord
     lat, lon = gc.UTMtoLL(northing,easting,utmzone)
-    print("lat: ",lat)
-    print("lon: ",lon)
-    print("-----------")
+    # print("lat: ",lat)
+    # print("lon: ",lon)
+    # print("-----------")
     latlong = NavSatFix()
+    latlong.header.frame_id = 'imu_link'
+    latlong.header.stamp = rospy.get_rostime()
     latlong.latitude = lat
     latlong.longitude = lon
     latlong.position_covariance = [0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5]
